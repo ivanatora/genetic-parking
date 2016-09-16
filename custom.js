@@ -68,7 +68,7 @@ function generate_oseva_linia() {
         segments: [[0, height/2], [width, height/2]],
 //        selected: true
     })
-    linia.strokeColor = '#fff';
+    linia.strokeColor = rgba(255, 255, 255, 0.1);
     linia.strokeWidth = 5;
     linia.dashArray = [60, 30];
 }
