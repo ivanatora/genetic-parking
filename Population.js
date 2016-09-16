@@ -60,8 +60,11 @@ function Population(cnt){
         this.members = [];
         for (i = 0; i < this.cnt; i++){
             var next_genes = [];
-            var parentA = random(this.mating_pool);
-            var parentB = random(this.mating_pool);
+            var idxA = Math.round(Math.random() * this.mating_pool.length)
+            var idxB = Math.round(Math.random() * this.mating_pool.length)
+            var parentA = this.mating_pool[idxA];
+            var parentB = this.mating_pool[idxB];
+            if (typeof parentA == 'undefined' || typeof parentB == 'undefined') return;
             
             var longer_parent, shorter_parent;
             if (parentA.length > parentB.length){
@@ -73,10 +76,10 @@ function Population(cnt){
                 shorter_parent = parentA;
             }
             
-            var split_mid = int(random(0, shorter_parent.length));
+            var split_mid = Math.round(Math.random() * shorter_parent.length);
             for (var j = 0; j < split_mid; j++){
                 next_genes[j] = parentA[j];
-                if (random(100) < iMutationRate){
+                if (Math.random() * 100 < iMutationRate){
                     //@TODO: mutation
                 }
             }
@@ -88,7 +91,7 @@ function Population(cnt){
                     next_genes[j] = longer_parent[j];
                 }
                 
-                if (random(100) < iMutationRate){
+                if (Math.random() * 100 < iMutationRate){
                     //@TODO: mutation
                 }
             }
