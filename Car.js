@@ -38,6 +38,7 @@ window.Car = function(genes){
     car_body.position = this.pos;
 
 
+    // wheels
     var front_up = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     front_up.fillColor = rgba(255, 0, 0, 0.5);
     front_up.strokeColor = 'green';
@@ -72,6 +73,14 @@ window.Car = function(genes){
     rare_b.x = car_h / 2 - this.drb;
     rare_b.y = car_w / 2;
     
+    front_a = this.pos.clone();
+    front_a.x = -car_h / 2 + this.dfb;
+    front_a.y = -car_w / 2;
+    
+    front_b = this.pos.clone();
+    front_b.x = -car_h / 2 + this.dfb;
+    front_b.y = car_w / 2;
+    
     tr_shape = new Path.Circle(new Point(0, 0), 1);
     tr_shape.strokeColor = 'green';
     
@@ -86,13 +95,16 @@ window.Car = function(genes){
     radius_line.strokeColor = 'green';
     radius_line.dashArray = [10, 10];
     
-    new_rac_shape = new Path.Circle(new Point(0, 0), 1);
-    new_rac_shape.strokeColor = rgba(0, 0, 255, 100);
+    new_rac_shape = new Path.Circle(new Point(0, 0), 5);
+    new_rac_shape.strokeColor = rgb(0, 0, 255);
+    new_rac_shape.fillColor = rgb(0, 0, 255);
     
-    new_pos_shape = new Path.Circle(new Point(0, 0), 1);
-    new_pos_shape.strokeColor = rgba(0, 255, 0, 100);
+    new_pos_shape = new Path.Circle(new Point(0, 0), 5);
+    new_pos_shape.strokeColor = rgb(0, 255, 0);
+    new_pos_shape.fillColor = rgb(0, 255, 0);
     
-    rac_shape = new Path.Circle(new Point(0, 0), 1);
+    rac_shape = new Path.Circle(new Point(0, 0), 5);
+    rac_shape.strokeColor = 'red';
     rac_shape.fillColor = 'red';
     
     this.update = function(){
@@ -102,6 +114,8 @@ window.Car = function(genes){
         front_up.rotate(-this.current_wheel_angle);
         front_down.rotate(-this.current_wheel_angle);
         car_body.rotate(-this.car_angle);
+        car_body.position = this.pos;
+        pos_shape.position = this.pos;
         
         var impulse;
         
@@ -116,7 +130,6 @@ window.Car = function(genes){
         this.current_wheel_angle = Math.min(this.maximum_wheel_angle, Math.max(-this.maximum_wheel_angle, this.current_wheel_angle + impulse));
 //        this.current_wheel_angle = 20;
 
-        console.log('current_wheel_angle', this.current_wheel_angle)
         front_up.rotate(this.current_wheel_angle);
         front_down.rotate(this.current_wheel_angle);
         
@@ -134,6 +147,16 @@ window.Car = function(genes){
         rare_b.y = this.pos.y + car_w/2;
         rare_a.rotate(this.car_angle, this.pos);
         rare_b.rotate(this.car_angle, this.pos);
+        
+        front_a.x = this.pos.x - car_h/2 + this.dfb;
+        front_a.y = this.pos.y - car_w/2;
+        front_b.x = this.pos.x - car_h/2 + this.dfb;
+        front_b.y = this.pos.y + car_w/2;
+        
+        rare_up.position = rare_a;
+        rare_down.position = rare_b;
+        front_up.position = front_a;
+        front_down.position = front_b;
         
         car_body.rotate(this.car_angle);
         
@@ -161,14 +184,13 @@ window.Car = function(genes){
         // center of rare axle
         this.rac = new Point(car_h/2 - this.drb, 0);
         this.rac.rotate(this.car_angle)
-        this.rac.add(this.pos)
+        this.rac.x += this.pos.x;
+        this.rac.y += this.pos.y;
+        rac_shape.position = this.rac;
 
-        // get vector to vehicle center
-        center_translated = radius_center.add(this.pos);
         radius_line.segments[0].point = radius_center;
         radius_line.segments[1].point = this.pos;
         
-
         cntr_to_pos = this.pos.clone().subtract(radius_center);
         cntr_to_rac = this.rac.clone().subtract(radius_center);
 
@@ -181,26 +203,24 @@ window.Car = function(genes){
             new_rac = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
         }
         
-        tmp_r = new_rac_shape.bounds.width / 2;
+//        tmp_r = new_rac_shape.bounds.width / 2;
         new_rac_shape.position = new_rac;
-        new_rac_shape.scale(5/tmp_r);
+//        new_rac_shape.scale(5/tmp_r);
         
         new_pos = this.pos.clone().subtract(this.rac.clone().subtract(new_rac))
-        tmp_r = new_pos_shape.bounds.width / 2;
         new_pos_shape.position = new_pos;
-        new_pos_shape.scale(2/tmp_r);
 
         this.car_angle += new_arc_angle;
+        console.log('car_angle', this.car_angle)
         
         
         newrac_to_rac = this.rac.clone().subtract(new_rac);
         newrac_to_rac.rotate(this.car_angle);
-        this.pos.subtract(newrac_to_rac)
+        this.pos = new_pos;
+//        this.pos.x -= newrac_to_rac.x;
+//        this.pos.y -= newrac_to_rac.y;
+//        console.log('newrac_to_rac', newrac_to_rac)
         
-
-        tmp_r = rac_shape.bounds.width / 2;
-        rac_shape.position = this.rac;
-        rac_shape.scale(2/tmp_r);
 
         
         this.update_counter++;

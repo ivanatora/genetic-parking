@@ -1,6 +1,6 @@
 width = view.size.width;
 height = view.size.height;
-fps = 3;
+frame_every = 20;
 fps_counter = 0;
 
 iMutationRate = 1; //%
@@ -68,8 +68,8 @@ function generate_oseva_linia() {
         segments: [[0, height/2], [width, height/2]],
 //        selected: true
     })
-    linia.strokeColor = rgba(255, 255, 255, 0.1);
-    linia.strokeWidth = 5;
+    linia.strokeColor = rgba(255, 255, 255, 0.5);
+    linia.strokeWidth = 2;
     linia.dashArray = [60, 30];
 }
 
@@ -132,13 +132,15 @@ $(document).ready(function(){
     })
 })
 
+setup();
 
 function onFrame() {
     if (run == false) return;
     fps_counter++;
-    if (fps_counter % fps != 0) return;
-    generate_oseva_linia(); // bring those back at some point
-    generate_targets();
+    if (fps_counter % frame_every != 0) return;
+    
+//    generate_oseva_linia(); // bring those back at some point
+//    generate_targets();
 
 
     if (! population){
