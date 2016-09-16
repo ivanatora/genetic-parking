@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Parking</title>
+    </head>
+    <body>
+        <table style='margin-bottom: 20px;'>
+            <tr>
+                <td>Mutation rate (%, int)</td>
+                <td><input type='number' name='mutation' value='1'/></td>
+            </tr>
+            <tr>
+                <td>Population size</td>
+                <td><input type='number' name='population' value='10'/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type='button' class='do' value='Go'/></td>
+            </tr>
+            <tr>
+                <td><input type='button' class='pause' value='Pause'/></td>
+                <td><input type='button' class='resume' value='Resume'/></td>
+            </tr>
+            <tr>
+                <td>Current record</td>
+                <td><div class='record'></div></td>
+            </tr>
+            <tr>
+                <td><b>Sum fitness</b></td>
+                <td><div class='sum_fitness'></div></td>
+            </tr>
+            <tr>
+                <td>Population number</td>
+                <td><div class='population_number'></div></td>
+            </tr>
+        </table>
+        
+        <div style="position: fixed; left: 700px;">
+            <table id="fitnesses">
+
+            </table>
+        </div>
+        
+        <canvas id="myCanvas" resize style="width: 1000px; height: 1000px; border: 1px solid gray; background: black;"></canvas>
+        
+        
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+        <script type="text/javascript" src="paper-full.js"></script>
+        <script type="text/javascript" src="Obstacle.js"></script>
+        <script type="text/javascript" src="Car.js"></script>
+        <script type="text/javascript" src="Population.js"></script>
+        <script type="text/paperscript" canvas="myCanvas" src="custom.js"></script>
+    </body>
+</html>
