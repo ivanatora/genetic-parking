@@ -3,7 +3,6 @@ window.Car = function(genes){
     this.acc = new Point(0, 0);
     this.vel = new Point(0, 0);
     
-//    this.maximum_wheel_angle = 30;
     this.maximum_wheel_angle = 30;
     this.current_wheel_angle = 0;
     this.car_angle = 0;
@@ -45,24 +44,12 @@ window.Car = function(genes){
     front_up.position.x = this.pos.x - axis_h/2;
     front_up.position.y = this.pos.y - car_w/2;
 
-    var front_down = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
-    front_down.fillColor = rgba(255, 0, 0, 0.5);
-    front_down.strokeColor = 'green';
-    front_down.rotate(this.current_wheel_angle);
-    front_down.position.x = this.pos.x - axis_h/2;
-    front_down.position.y = this.pos.y + car_w/2;
 
     var rare_up = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     rare_up.fillColor = rgba(0, 0, 0, 0.1);
     rare_up.strokeColor = 'green';
     rare_up.position.x = this.pos.x + axis_h/2;
     rare_up.position.y = this.pos.y - car_w/2;
-
-    var rare_down = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
-    rare_down.fillColor = rgba(0, 0, 0, 0.1);
-    rare_down.strokeColor = 'green';
-    rare_down.position.x = this.pos.x + axis_h/2;
-    rare_down.position.y = this.pos.y + car_w/2;
     
     rare_a = this.pos.clone();
     rare_a.x = axis_h/2;
@@ -111,7 +98,6 @@ window.Car = function(genes){
         
         // reset wheel angles
         front_up.rotate(-this.current_wheel_angle);
-        front_down.rotate(-this.current_wheel_angle);
         this.prev_car_angle = this.car_angle;
         car_body.position = this.pos;
         pos_shape.position = this.pos;
@@ -133,7 +119,7 @@ window.Car = function(genes){
         // calculate turning radius and travelled arc length
         this.tr = axis_h / sin(radians(this.current_wheel_angle));
         turning_circle_len = abs(PI * 2 * this.tr);
-        arc_angle = 100 / this.tr; // 20 is default
+        arc_angle = 20 / this.tr; // 20 is default
 
         this.circle_pos = this.pos.clone();
         this.circle_pos.length = this.tr;
@@ -162,12 +148,9 @@ window.Car = function(genes){
         tr_shape.scale(this.tr / tmp_r);
         
 
-//        radius_axle_line = new Path.Line(rare_a, radius_center);
         radius_axle_line.segments[0].point = rare_a;
         radius_axle_line.segments[1].point = radius_center;
 
-
-//        rare_axle_line = new Path.Line(rare_a, rare_b);// turning radius trough the rare axle // debug - OK
         rare_axle_line.segments[0].point = rare_a;
         rare_axle_line.segments[1].point = rare_b;
         
@@ -194,9 +177,7 @@ window.Car = function(genes){
             new_rac = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
         }
         
-//        tmp_r = new_rac_shape.bounds.width / 2;
         new_rac_shape.position = new_rac;
-//        new_rac_shape.scale(5/tmp_r);
         
         new_pos = this.pos.clone().subtract(this.rac.clone().subtract(new_rac))
         new_pos_shape.position = new_pos;
@@ -211,21 +192,13 @@ window.Car = function(genes){
         
         front_up.rotate(this.current_wheel_angle);
         front_up.rotate(this.delta_angle, radius_center)
-        front_down.rotate(this.current_wheel_angle);
-        front_down.rotate(this.delta_angle, radius_center)
         rare_up.position = rare_a;
         rare_up.rotate(this.delta_angle, radius_center)
-        rare_down.position = rare_b;
-        rare_down.rotate(this.delta_angle, radius_center)
         front_up.position = front_a;
-        front_down.position = front_b;
-        
         
         newrac_to_rac = this.rac.clone().subtract(new_rac);
         newrac_to_rac.rotate(this.car_angle);
         this.pos = new_pos;
-        
-
         
         this.update_counter++;
     }
