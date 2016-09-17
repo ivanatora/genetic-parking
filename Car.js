@@ -22,10 +22,7 @@ window.Car = function(genes){
     
     this.tire_w = 20;
     this.tire_h = 10;
-    this.dfb = 20; // distance front bumper -> front axle
-    this.dra = this.dfb + axis_h; // distance front bumper -> rare axle
-    this.drb = car_h - this.dra; // distance rare bumper -> rare axle
-    this.rac = new Point(car_h/2 - this.drb, 0);; // rare axle center
+    this.rac = new Point(axis_h/2, 0);; // rare axle center
     
     this.circle_pos = 0;
     
@@ -34,7 +31,7 @@ window.Car = function(genes){
     var pos_shape = new Path.Circle(this.pos, 5);
     pos_shape.fillColor = 'white';
 
-    var car_body = new Path.Rectangle(- car_h / 2, - car_w/2, car_h, car_w);
+    var car_body = new Path.Rectangle(- car_h/2, - car_w/2, car_h, car_w);
     car_body.fillColor = rgba(0, 0, 0, 0.1);
     car_body.strokeColor = 'green';
     car_body.position = this.pos;
@@ -45,42 +42,42 @@ window.Car = function(genes){
     front_up.fillColor = rgba(255, 0, 0, 0.5);
     front_up.strokeColor = 'green';
     front_up.rotate(this.current_wheel_angle);
-    front_up.position.x = this.pos.x - car_h/2 + this.dfb;
+    front_up.position.x = this.pos.x - axis_h/2;
     front_up.position.y = this.pos.y - car_w/2;
 
     var front_down = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     front_down.fillColor = rgba(255, 0, 0, 0.5);
     front_down.strokeColor = 'green';
     front_down.rotate(this.current_wheel_angle);
-    front_down.position.x = this.pos.x - car_h/2 + this.dfb;
+    front_down.position.x = this.pos.x - axis_h/2;
     front_down.position.y = this.pos.y + car_w/2;
 
     var rare_up = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     rare_up.fillColor = rgba(0, 0, 0, 0.1);
     rare_up.strokeColor = 'green';
-    rare_up.position.x = this.pos.x + car_h/2 - this.drb;
+    rare_up.position.x = this.pos.x + axis_h/2;
     rare_up.position.y = this.pos.y - car_w/2;
 
     var rare_down = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     rare_down.fillColor = rgba(0, 0, 0, 0.1);
     rare_down.strokeColor = 'green';
-    rare_down.position.x = this.pos.x + car_h/2 - this.drb;
+    rare_down.position.x = this.pos.x + axis_h/2;
     rare_down.position.y = this.pos.y + car_w/2;
     
     rare_a = this.pos.clone();
-    rare_a.x = car_h / 2 - this.drb;
+    rare_a.x = axis_h/2;
     rare_a.y = -car_w / 2;
 
     rare_b = this.pos.clone();
-    rare_b.x = car_h / 2 - this.drb;
+    rare_b.x = axis_h/2;
     rare_b.y = car_w / 2;
     
     front_a = this.pos.clone();
-    front_a.x = -car_h / 2 + this.dfb;
+    front_a.x = -axis_h/2;
     front_a.y = -car_w / 2;
     
     front_b = this.pos.clone();
-    front_b.x = -car_h / 2 + this.dfb;
+    front_b.x = -axis_h/2;
     front_b.y = car_w / 2;
     
     tr_shape = new Path.Circle(new Point(0, 0), 1);
@@ -142,16 +139,16 @@ window.Car = function(genes){
         this.circle_pos.length = this.tr;
 
         // calculate part centres
-        rare_a.x = this.pos.x + car_h/2 - this.drb;
+        rare_a.x = this.pos.x + axis_h/2;
         rare_a.y = this.pos.y - car_w/2;
-        rare_b.x = this.pos.x + car_h/2 - this.drb;
+        rare_b.x = this.pos.x + axis_h/2;
         rare_b.y = this.pos.y + car_w/2;
         rare_a.rotate(this.car_angle, this.rac);
         rare_b.rotate(this.car_angle, this.rac);
         
-        front_a.x = this.pos.x - car_h/2 + this.dfb;
+        front_a.x = this.pos.x - axis_h/2;
         front_a.y = this.pos.y - car_w/2;
-        front_b.x = this.pos.x - car_h/2 + this.dfb;
+        front_b.x = this.pos.x - axis_h/2;
         front_b.y = this.pos.y + car_w/2;
         
         axle_a_b = rare_b.clone().subtract(rare_a)
@@ -176,9 +173,9 @@ window.Car = function(genes){
         
         
         // center of rare axle
-        this.rac = new Point(car_h/2 - this.drb, 0);
+        this.rac = new Point(axis_h/2, 0);
         this.rac.rotate(this.car_angle)
-        this.rac.x = this.pos.x + car_h/2 - this.drb;
+        this.rac.x = this.pos.x + axis_h/2;
         this.rac.y += this.pos.y;
         rac_shape.position = this.rac;
 
