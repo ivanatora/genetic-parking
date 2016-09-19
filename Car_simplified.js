@@ -6,7 +6,7 @@ window.Car = function(genes){
     this.maximum_wheel_angle = 30;
     this.current_wheel_angle = 0;
     this.last_wheel_angle = 0;
-    this.heading = 20;
+    this.heading = 0;
     this.last_heading = 0;
     this.delta_angle = 0;
     this.tr = 0;
@@ -73,11 +73,12 @@ window.Car = function(genes){
         
         
         front_shape.rotate(-this.last_wheel_angle);
-        car_shape.rotate(-this.last_heading);
-        console.log('begin rot', -this.last_heading)
-        this.last_heading = this.heading;
-        front_shape.rotate(-this.last_heading);
-        back_shape.rotate(-this.last_heading);
+//        this.last_heading = this.heading;
+        car_shape.rotate(-this.heading);
+        console.log('begin rot', -this.heading)
+        
+        front_shape.rotate(-this.heading);
+        back_shape.rotate(-this.heading);
         
         
         car_shape.position = this.pos;
@@ -139,17 +140,17 @@ window.Car = function(genes){
         //this.heading += new_arc_angle;
 //        this.delta_angle = this.heading - this.prev_heading;
 //        this.delta_angle = -this.delta_angle;
-//        this.heading += 5;
+        this.heading = -25;
 //        
 
         front_shape.rotate(this.current_wheel_angle);
         car_shape.rotate(this.heading);
         console.log('end rot', this.heading)
-        front_shape.position.x = this.pos.x - axis_h/2 * cos(radians(this.heading));
-        front_shape.position.y = this.pos.y - axis_h/2 * sin(radians(this.heading));
+        front_shape.position.x = car_shape.position.x - axis_h/2 * cos(radians(this.heading));
+        front_shape.position.y = car_shape.position.y - axis_h/2 * sin(radians(this.heading));
         front_shape.rotate(this.heading);
-        back_shape.position.x = this.pos.x + axis_h/2 * cos(radians(this.heading));
-        back_shape.position.y = this.pos.y + axis_h/2 * sin(radians(this.heading));
+        back_shape.position.x = car_shape.position.x + axis_h/2 * cos(radians(this.heading));
+        back_shape.position.y = car_shape.position.y + axis_h/2 * sin(radians(this.heading));
         back_shape.rotate(this.heading);
         
         this.update_counter++;
