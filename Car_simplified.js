@@ -22,7 +22,6 @@ window.Car = function(genes){
     
     this.tire_w = 20;
     this.tire_h = 10;
-    this.rac = new Point(axis_h/2, 0);; // rare axle center
     
     this.circle_pos = 0;
     
@@ -62,6 +61,9 @@ window.Car = function(genes){
     radius_line.strokeColor = 'green';
     radius_line.dashArray = [10, 10];
     
+    new_pos_shape = new Path.Circle(new Point(0, 0), 10);
+    new_pos_shape.fillColor = 'pink';
+    
     
     this.update = function(){
         if (this.is_dead) return;
@@ -87,7 +89,7 @@ window.Car = function(genes){
         else {
             impulse = Math.random() * 10 - 5; // random rotation
         }
-//        impulse = 10;
+        impulse = -10;
         this.next_genes.push(impulse); // save for further generations
         
         this.current_wheel_angle = Math.min(this.maximum_wheel_angle, Math.max(-this.maximum_wheel_angle, this.current_wheel_angle + impulse));
@@ -96,7 +98,7 @@ window.Car = function(genes){
         // calculate turning radius and travelled arc length
         this.tr = axis_h / sin(radians(this.current_wheel_angle));
         turning_circle_len = abs(PI * 2 * this.tr);
-        arc_angle = 20 / this.tr; // 20 is default
+        arc_angle = 100 / this.tr; // 20 is default
 
         this.tr += car_w / 2;
         
@@ -112,7 +114,6 @@ window.Car = function(genes){
         tr_shape.scale(this.tr / tmp_r);
         
         
-
         radius_line.segments[0].point = radius_center;
         radius_line.segments[1].point = back_shape.position;
         
@@ -121,14 +122,16 @@ window.Car = function(genes){
 
         if (this.current_wheel_angle > 0){
             new_arc_angle = cntr_to_back.angleInRadians - arc_angle;
-            new_rac = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
+            new_back = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
         }
         else {
             new_arc_angle = cntr_to_back.angleInRadians - arc_angle + PI;
-            new_rac = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
+            new_back = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
         }
         
-        new_pos = this.pos.clone().subtract(this.rac.clone().subtract(new_rac))
+        new_pos = this.pos.clone().subtract(back_shape.position.clone().subtract(new_back));
+        new_pos_shape.position = new_pos;
+        console.log(new_pos)
 
         //this.heading += new_arc_angle;
 //        this.delta_angle = this.heading - this.prev_heading;
