@@ -1,6 +1,6 @@
 width = view.size.width;
 height = view.size.height;
-frame_every = 100;
+frame_every = 20;
 fps_counter = 0;
 
 iMutationRate = 1; //%

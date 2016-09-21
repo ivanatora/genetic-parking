@@ -61,8 +61,12 @@ window.Car = function(genes){
     radius_line.strokeColor = 'green';
     radius_line.dashArray = [10, 10];
     
-    new_pos_shape = new Path.Circle(new Point(0, 0), 10);
+//    new_pos_shape = new Path.Circle(new Point(0, 0), 10);
+    new_pos_shape = new Path.Rectangle(0, 0, 10, 20);
     new_pos_shape.fillColor = 'pink';
+    
+    new_back_shape = new Path.Circle(new Point(0, 0), 5);
+    new_back_shape.fillColor = 'green';
     
     
     this.update = function(){
@@ -89,7 +93,7 @@ window.Car = function(genes){
         else {
             impulse = Math.random() * 10 - 5; // random rotation
         }
-        impulse = -10;
+        impulse = 10;
         this.next_genes.push(impulse); // save for further generations
         
         this.current_wheel_angle = Math.min(this.maximum_wheel_angle, Math.max(-this.maximum_wheel_angle, this.current_wheel_angle + impulse));
@@ -98,13 +102,11 @@ window.Car = function(genes){
         // calculate turning radius and travelled arc length
         this.tr = axis_h / sin(radians(this.current_wheel_angle));
         turning_circle_len = abs(PI * 2 * this.tr);
-        arc_angle = 100 / this.tr; // 20 is default
+        arc_angle = 50 / this.tr; // 20 is default
 
         this.tr += car_w / 2;
         
         radius_center = back_shape.position.clone().subtract(front_shape.position.clone()).rotate(-90);
-//        console.log('back', back_shape.position, 'front', front_shape.position)
-//        console.log('radius_center', back_shape.position.clone().subtract(front_shape.position.clone()))
         radius_center.length = this.tr;
         radius_center = radius_center.add(back_shape.position.clone())
         
@@ -119,28 +121,32 @@ window.Car = function(genes){
         
         cntr_to_pos = this.pos.clone().subtract(radius_center);
         cntr_to_back = back_shape.position.clone().subtract(radius_center);
+        console.log('cntr_to_back.angle', cntr_to_back.angle, 'arc_angle in degrees', degrees(arc_angle))
 
-        if (this.current_wheel_angle > 0){
-            new_arc_angle = cntr_to_back.angleInRadians - arc_angle;
-            new_back = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
+        new_arc_angle_radians = cntr_to_back.angleInRadians - arc_angle;
+//        new_arc_angle_radians =  arc_angle;
+        if (this.current_wheel_angle < 0){
+            new_arc_angle_radians = new_arc_angle_radians + PI;
         }
         else {
-            new_arc_angle = cntr_to_back.angleInRadians - arc_angle + PI;
-            new_back = new Point(radius_center.x + this.tr * cos(new_arc_angle), radius_center.y + this.tr * sin(new_arc_angle));
+//            new_arc_angle_radians = new_arc_angle_radians;
         }
+        new_back = new Point(radius_center.x + this.tr * cos(new_arc_angle_radians), radius_center.y + this.tr * sin(new_arc_angle_radians));
+        
+        this.heading += new_arc_angle_radians;
+        console.log('new heading', this.heading, 'newarc_angle in degrees', degrees(new_arc_angle_radians))
         
         new_pos = this.pos.clone().subtract(back_shape.position.clone().subtract(new_back));
+        new_pos.rotate(-degrees(new_arc_angle_radians), new_back);
+        console.log('new_pos', new_pos)
         new_pos_shape.position = new_pos;
-        console.log(new_pos)
+        
+        new_back_shape.position = new_back;
 
-        //this.heading += new_arc_angle;
-//        this.delta_angle = this.heading - this.prev_heading;
-//        this.delta_angle = -this.delta_angle;
-//        this.heading = 25;
-//        
-
+        
         front_shape.rotate(this.current_wheel_angle);
         car_shape.rotate(this.heading);
+//        car_shape.position = new_pos;
         front_shape.position.x = car_shape.position.x - axis_h/2 * cos(radians(this.heading));
         front_shape.position.y = car_shape.position.y - axis_h/2 * sin(radians(this.heading));
         front_shape.rotate(this.heading);
