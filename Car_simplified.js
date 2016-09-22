@@ -1,5 +1,5 @@
 window.Car = function(genes){
-    this.pos = new Point(car_h/2 + 200, height/2);
+    this.pos = new Point(car_h/2, height/2);
 
     this.maximum_wheel_angle = 30;
     this.current_wheel_angle = 0;
@@ -10,6 +10,7 @@ window.Car = function(genes){
     
     this.fitness = 1;
     this.is_dead = false;
+    this.is_hit = false;
     
     this.genes = genes || [];
     this.next_genes = [];
@@ -21,15 +22,10 @@ window.Car = function(genes){
     this.circle_pos = 0;
     
     // draw car body and wheels
-    
-    this.pos_shape = new Path.Circle(this.pos, 5);
-    this.pos_shape.fillColor = 'white';
-
     this.car_shape = new Path.Rectangle(- car_h/2, - car_w/2, car_h, car_w);
     this.car_shape.fillColor = rgba(0, 0, 0, 0.1);
     this.car_shape.strokeColor = 'green';
     this.car_shape.position = this.pos;
-
 
     // wheels
     this.front_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
@@ -39,7 +35,6 @@ window.Car = function(genes){
     this.front_shape.position.y = this.pos.y - axis_h/2 * sin(this.heading_radians);
     this.front_shape.rotate(degrees(this.heading_radians));
     this.front_shape.rotate(this.current_wheel_angle);
-
 
     this.back_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
     this.back_shape.fillColor = rgba(0, 0, 0, 0.1);
@@ -51,33 +46,44 @@ window.Car = function(genes){
     
     this.tr_shape = new Path.Circle(new Point(0, 0), 1);
     this.tr_shape.strokeColor = 'green';
+    if (! debug){
+        this.tr_shape.strokeColor = rgba(0, 0, 0, 0);
+    }
     
     this.radius_line = new Path.Line(0, 0);
     this.radius_line.strokeColor = 'green';
     this.radius_line.dashArray = [10, 10];
+    if (! debug){
+        this.radius_line.strokeColor = rgba(0, 0, 0, 0);
+    }
     
 //    this.new_pos_shape = new Path.Circle(new Point(0, 0), 10);
     this.new_pos_shape = new Path.Circle(new Point(0, 0), 3);
     this.new_pos_shape.fillColor = 'pink';
+    if (! debug){
+        this.new_pos_shape.fillColor = rgba(0, 0, 0, 0);
+    }
     
     this.new_back_shape = new Path.Circle(new Point(0, 0), 5);
     this.new_back_shape.fillColor = 'green';
+    if (! debug){
+        this.new_back_shape.fillColor = rgba(0, 0, 0, 0);
+    }
     
     
     this.update = function(){
         if (this.is_dead) return;
 
         
-        
+        // rotate() works relative to the previous position, so make sure that position is 0
         this.front_shape.rotate(-this.last_wheel_angle);
         this.car_shape.rotate(degrees(-this.heading_radians));
-        
         this.front_shape.rotate(degrees(-this.heading_radians));
         this.back_shape.rotate(degrees(-this.heading_radians));
         
-        
-        this.car_shape.position = this.pos;
-        this.pos_shape.position = this.pos;
+        //
+        // this.car_shape.position = this.pos;
+        // this.pos_shape.position = this.pos;
 
         // get new iteration parameter
         var impulse;
@@ -85,7 +91,7 @@ window.Car = function(genes){
             impulse = this.genes[this.update_counter];
         }
         else {
-            impulse = Math.random() * 10 - 5; // random rotation
+            impulse = Math.random() * 20 - 10; // random rotation
         }
         // impulse = -10;
         this.next_genes.push(impulse); // save for further generations
@@ -115,7 +121,7 @@ window.Car = function(genes){
             radius_center = radius_center.rotate(90);
         }
         radius_center.length = this.tr;
-        radius_center = radius_center.add(this.back_shape.position.clone())
+        radius_center = radius_center.add(this.back_shape.position)
 
         this.tr_shape.position = radius_center;
         var tmp_r = this.tr_shape.bounds.width / 2;
@@ -124,7 +130,7 @@ window.Car = function(genes){
         this.radius_line.segments[0].point = radius_center;
         this.radius_line.segments[1].point = this.back_shape.position;
         
-        var cntr_to_back = this.back_shape.position.clone().subtract(radius_center);
+        var cntr_to_back = this.back_shape.position.subtract(radius_center);
         var new_arc_angle_radians = cntr_to_back.angleInRadians - arc_angle;
 
         // the back of the car should be on that turning circle
@@ -132,7 +138,7 @@ window.Car = function(genes){
             radius_center.x + this.tr * cos(new_arc_angle_radians),
             radius_center.y + this.tr * sin(new_arc_angle_radians));
 
-        var cntr_to_new_back = new_back.clone().subtract(radius_center);
+        var cntr_to_new_back = new_back.subtract(radius_center);
 
         this.heading_radians = cntr_to_new_back.angleInRadians;
         if (this.current_wheel_angle > 0){
@@ -161,17 +167,40 @@ window.Car = function(genes){
         this.back_shape.position.x = this.car_shape.position.x + axis_h/2 * cos(this.heading_radians);
         this.back_shape.position.y = this.car_shape.position.y + axis_h/2 * sin(this.heading_radians);
         this.back_shape.rotate(degrees(this.heading_radians));
+
+        this.pos = this.car_shape.position;
         
         this.update_counter++;
+
+        this.constrain_to_screen();
+        this.check_obstacles();
     }
     
     this.evaluate = function(){
-        
+        var dist_back = this.back_shape.position.getDistance(targets[1]);
+        var dist_front = this.front_shape.position.getDistance(targets[0]);
+        var max_dist = 560;
+        this.fitness = (dist_front + dist_back) / 2;
+        if (this.fitness < 20){
+            this.fitness = 100;
+            return;
+        }
+        this.fitness = map_range(this.fitness, 0, 560, 100, 0);
+        if (this.is_hit){
+            this.fitness /= 2;
+        }
+
+        this.fitness = Math.round(this.fitness);
+        // this.fitness = Math.pow(this.fitness, 3);
+        console.log('fitness', this.fitness, dist_back,dist_front)
     }
     
     this.constrain_to_screen = function(){
         // don't get outside the screen
         if (this.pos.y > height){ // on floor
+            this.is_dead = true;
+        }
+        if (this.pos.y < 0){ // on floor
             this.is_dead = true;
         }
         if (this.pos.x > width){ // on left
@@ -182,17 +211,44 @@ window.Car = function(genes){
         }
         
         if (this.is_dead){ // remove the defective gene
-            this.next_genes.splice(this.jump_counter-1, 1);
+            this.next_genes.splice(this.update_counter-1, 1);
         }
         // do we care about shooting above top? probably not
     }
-    
+
     this.show = function(){
         
         
     }
     
-    this.hits = function(obstacle){
-        
+    this.check_obstacles = function(){
+        for (var i = 0; i < obstacles.length; i++){
+            if (obstacles[i].shape.contains(this.car_shape.bounds.topLeft)){
+                this.is_dead = true;
+                this.is_hit = true;
+                return;
+            }
+            if (obstacles[i].shape.contains(this.car_shape.bounds.topRight)){
+                this.is_dead = true;
+                this.is_hit = true;
+                return;
+            }
+            if (obstacles[i].shape.contains(this.car_shape.bounds.bottomLeft)){
+                this.is_dead = true;
+                this.is_hit = true;
+                return;
+            }
+            if (obstacles[i].shape.contains(this.car_shape.bounds.bottomRight)){
+                this.is_dead = true;
+                this.is_hit = true;
+                return;
+            }
+        }
+    }
+
+    this.remove = function(){
+        this.car_shape.remove();
+        this.front_shape.remove();
+        this.back_shape.remove();
     }
 }

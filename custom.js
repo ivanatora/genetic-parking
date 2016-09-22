@@ -2,9 +2,10 @@ width = view.size.width;
 height = view.size.height;
 frame_every = 10;
 fps_counter = 0;
+debug = false;
 
 iMutationRate = 1; //%
-iPopulationSize = 1;
+iPopulationSize = 10;
 bFinished = false;
 population = null;
 population_number = 0;
@@ -27,8 +28,8 @@ car_h = 46 * car_scale;
 axis_h = 27 * car_scale;
 
 targets = [
-    new Point(260, height - 25),
-    new Point(260 + axis_h, height - 25),
+    new Point(400, height - 25),
+    new Point(400 + axis_h, height - 25),
 ];
 
 function setup() {
@@ -38,27 +39,21 @@ function setup() {
     bFinished = false;
     population = null;
 
-//    generate_obstacles();
+    generate_obstacles();
     generate_oseva_linia();
     generate_targets();
 }
 
 function generate_obstacles() {
-    // bottom row
-    var obstacle1 = new Obstacle(new Point(10, height - 10 - car_w), car_h, car_w);
-    obstacles.push(obstacle1);
-
-    // parking space here
-
-    var obstacle2 = new Obstacle(new Point(130, height - 10 - car_w), car_h, car_w);
-    obstacles.push(obstacle2);
-
-    var obstacle3 = new Obstacle(new Point(230 + 30 + car_h, height - 10 - car_w), car_h, car_w);
-    obstacles.push(obstacle3);
-
     // upper row
     for (var i = 0; i < 4; i++){
         var obstacle = new Obstacle(new Point(10 + ((car_h + 30) * i), 10 ), car_h, car_w);
+        obstacles.push(obstacle);
+    }
+
+    // bottom row
+    for (var i = 0; i < 3; i++){
+        var obstacle = new Obstacle(new Point(10 + ((car_h + 30) * i), height - car_w - 10), car_h, car_w);
         obstacles.push(obstacle);
     }
 }
@@ -74,7 +69,6 @@ function generate_oseva_linia() {
 }
 
 function generate_targets() {
-
     for (var i = 0; i < targets.length; i++){
         var target1 = new Path.Line(targets[i].x - 5, targets[i].y, targets[i].x + 5, targets[i].y);
         var target2 = new Path.Line(targets[i].x, targets[i].y - 5, targets[i].x, targets[i].y + 5);
@@ -104,6 +98,9 @@ window.rgb = function(r, g, b){
 }
 window.rgba = function(r, g, b, a){
     return new Color(r, g, b, a);
+}
+window.map_range = function(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
 }
 
 $(document).ready(function(){
@@ -135,14 +132,11 @@ $(document).ready(function(){
 setup();
 
 function onFrame() {
-    if (run == false) return;
+    if (run == false) return; // play-pause
+
     fps_counter++;
-    if (fps_counter % frame_every != 0) return;
+    if (fps_counter % frame_every != 0) return; // 1 frame per X seconds
     
-//    generate_oseva_linia(); // bring those back at some point
-//    generate_targets();
-
-
     if (! population){
         population = new Population(iPopulationSize);
     }
@@ -150,14 +144,11 @@ function onFrame() {
     population.update();
     population.show();
 
-    for (var i = 0; i < obstacles.length; i++){
-        obstacles[i].show();
-    }
-
     population.lifespan--;
     if (population.lifespan <= 0){
         population.evaluate();
         population.crossover();
+        population.purge();
         population.resurrect();
 
         $('.population_number').html(population_number++);

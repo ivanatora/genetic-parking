@@ -4,6 +4,7 @@ function Population(cnt){
     this.lifespan = this.initial_lifespan;
     
     this.members = [];
+    this.new_members = [];
     this.mating_pool = [];
     this.last_mating_pool = [];
     
@@ -41,23 +42,26 @@ function Population(cnt){
             sum_fitness += this.members[i].fitness;
         }
         $('.sum_fitness').html(sum_fitness);
-        
+        $('.average_fitness').html(sum_fitness / this.members.length);
+
         if (sum_fitness > current_record) current_record = sum_fitness;
         
         this.mating_pool = [];
         for (var i = 0; i < this.members.length; i++){
             $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].fitness+'</td></tr>');
             if (this.members[i].fitness > 0){
-                for (var j = 0; j < this.members[i].fitness; j++){
+                var allowed_pool_slots = Math.floor(this.members[i].fitness / 10);
+                for (var j = 0; j < allowed_pool_slots; j++){
                     this.mating_pool.push(this.members[i].next_genes);
                 }
             }
         }
+        console.log('end of crossover with mating pool', this.mating_pool)
         
     }
     
     this.crossover = function(){
-        this.members = [];
+        this.new_members = [];
         for (i = 0; i < this.cnt; i++){
             var next_genes = [];
             var idxA = Math.round(Math.random() * this.mating_pool.length)
@@ -95,10 +99,24 @@ function Population(cnt){
                     //@TODO: mutation
                 }
             }
+            if (Math.random() * 100 < iMutationRate){
+                var gene_idx = Math.round(Math.random() * next_genes.length);
+                var gene_value = Math.random() * 20 - 10;
+                next_genes[gene_idx] = gene_value;
+            }
+
 //            console.log('elected genes', next_genes)
             
-            this.members.push(new Car(next_genes));
+            this.new_members.push(new Car(next_genes));
         }
+    }
+
+    this.purge = function(){
+        for (var i = 0; i < this.members.length; i++){
+            this.members[i].remove();
+        }
+
+        this.members = this.new_members;
     }
     
     this.resurrect = function(){
