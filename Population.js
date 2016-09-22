@@ -49,20 +49,21 @@ function Population(cnt){
         this.mating_pool = [];
         for (var i = 0; i < this.members.length; i++){
             $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].fitness+'</td></tr>');
-            if (this.members[i].fitness > 0){
-                var allowed_pool_slots = Math.floor(this.members[i].fitness / 10);
-                for (var j = 0; j < allowed_pool_slots; j++){
-                    this.mating_pool.push(this.members[i].next_genes);
-                }
+            var allowed_pool_slots = Math.floor(this.members[i].fitness / 10);
+            for (var j = 0; j < allowed_pool_slots; j++){
+                this.mating_pool.push(this.members[i].next_genes);
             }
         }
-        console.log('end of crossover with mating pool', this.mating_pool)
-        
+        $('#fitnesses').append('<tr><td>M. pool</td><td>'+this.mating_pool.length+'</td></tr>')
+        if (this.mating_pool.length == 0){
+            run = false;
+        }
+
     }
     
     this.crossover = function(){
         this.new_members = [];
-        for (i = 0; i < this.cnt; i++){
+        for (var i = 0; i < this.cnt; i++){
             var next_genes = [];
             var idxA = Math.round(Math.random() * this.mating_pool.length)
             var idxB = Math.round(Math.random() * this.mating_pool.length)
@@ -83,9 +84,6 @@ function Population(cnt){
             var split_mid = Math.round(Math.random() * shorter_parent.length);
             for (var j = 0; j < split_mid; j++){
                 next_genes[j] = parentA[j];
-                if (Math.random() * 100 < iMutationRate){
-                    //@TODO: mutation
-                }
             }
             for (var j = split_mid; j < longer_parent.length; j++){
                 if (typeof parentB[j] != 'undefined'){
@@ -94,19 +92,15 @@ function Population(cnt){
                 else {
                     next_genes[j] = longer_parent[j];
                 }
-                
-                if (Math.random() * 100 < iMutationRate){
-                    //@TODO: mutation
-                }
             }
+
+            // mutation
             if (Math.random() * 100 < iMutationRate){
                 var gene_idx = Math.round(Math.random() * next_genes.length);
                 var gene_value = Math.random() * 20 - 10;
                 next_genes[gene_idx] = gene_value;
             }
 
-//            console.log('elected genes', next_genes)
-            
             this.new_members.push(new Car(next_genes));
         }
     }

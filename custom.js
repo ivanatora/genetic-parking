@@ -1,10 +1,10 @@
 width = view.size.width;
 height = view.size.height;
-frame_every = 10;
+frame_every = 2;
 fps_counter = 0;
 debug = false;
 
-iMutationRate = 1; //%
+iMutationRate = 10; //%
 iPopulationSize = 10;
 bFinished = false;
 population = null;
@@ -98,6 +98,9 @@ window.rgb = function(r, g, b){
 }
 window.rgba = function(r, g, b, a){
     return new Color(r, g, b, a);
+}
+window.map = function (val, in_min, in_max, out_min, out_max) {
+    return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 window.map_range = function(value, low1, high1, low2, high2) {
     return low2 + (high2 - low2) * (value - low1) / (high1 - low1);

@@ -179,20 +179,20 @@ window.Car = function(genes){
     this.evaluate = function(){
         var dist_back = this.back_shape.position.getDistance(targets[1]);
         var dist_front = this.front_shape.position.getDistance(targets[0]);
+        var desired_angle = 0;
         var max_dist = 560;
-        this.fitness = (dist_front + dist_back) / 2;
-        if (this.fitness < 20){
-            this.fitness = 100;
-            return;
-        }
-        this.fitness = map_range(this.fitness, 0, 560, 100, 0);
+        this.fitness = map(dist_back, 0, max_dist, 100, 0);
         if (this.is_hit){
             this.fitness /= 2;
+        }
+        this.fitness -= this.heading_radians * 5;
+        if (this.fitness < 0){
+            this.fitness = 10;
         }
 
         this.fitness = Math.round(this.fitness);
         // this.fitness = Math.pow(this.fitness, 3);
-        console.log('fitness', this.fitness, dist_back,dist_front)
+        console.log('fitness', this.fitness, this.heading_radians)
     }
     
     this.constrain_to_screen = function(){
