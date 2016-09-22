@@ -97,7 +97,7 @@ window.Car = function(genes){
         // calculate turning radius and travelled arc length
         this.tr = axis_h / sin(radians(this.current_wheel_angle));
         // var turning_circle_len = abs(PI * 2 * this.tr);
-        var arc_angle = 40 / this.tr; // 20 is default
+        var arc_angle = 10 / this.tr; // 20 is default
 
         this.tr += car_w / 2;
         
@@ -122,7 +122,7 @@ window.Car = function(genes){
         // new_arc_angle_radians = arc_angle;
         console.log('new_arc_angle_radians = cntr_to_back.angleInRadians - arc_angle', new_arc_angle_radians, cntr_to_back.angleInRadians, arc_angle);
         if (this.current_wheel_angle < 0){
-            new_arc_angle_radians = new_arc_angle_radians + PI;
+            // new_arc_angle_radians = new_arc_angle_radians + PI;
         }
         else {
            // new_arc_angle_radians = new_arc_angle_radians + PI/2;
@@ -131,16 +131,21 @@ window.Car = function(genes){
         new_back = new Point(
             radius_center.x + this.tr * cos(new_arc_angle_radians),
             radius_center.y + this.tr * sin(new_arc_angle_radians));
+
+        var cntr_to_new_back = new_back.clone().subtract(radius_center);
+        console.log('new back angle', cntr_to_new_back.angle)
         
-        this.heading_radians += arc_angle;
+        // this.heading_radians += arc_angle;
+        this.heading_radians = cntr_to_new_back.angleInRadians - PI/2;
+
         console.log('new heading_radians', this.heading_radians, 'newarc_angle in degrees', degrees(new_arc_angle_radians))
         
         // new_pos = this.pos.clone().subtract(this.back_shape.position.clone().subtract(new_back));
         // new_pos.rotate(-degrees(new_arc_angle_radians), new_back);
 
         new_pos = new Point(
-            new_back.x - axis_h/2 * cos(-this.heading_radians),
-            new_back.y - axis_h/2 * sin(-this.heading_radians));
+            new_back.x - axis_h/2 * cos(this.heading_radians),
+            new_back.y - axis_h/2 * sin(this.heading_radians));
 
         console.log('new_pos', new_pos);
         this.new_pos_shape.position = new_pos;
@@ -150,7 +155,7 @@ window.Car = function(genes){
         
         this.front_shape.rotate(this.current_wheel_angle);
         this.car_shape.rotate(degrees(this.heading_radians));
-        // this.car_shape.position = new_pos;
+        this.car_shape.position = new_pos;
         this.front_shape.position.x = this.car_shape.position.x - axis_h/2 * cos(this.heading_radians);
         this.front_shape.position.y = this.car_shape.position.y - axis_h/2 * sin(this.heading_radians);
         this.front_shape.rotate(degrees(this.heading_radians));
