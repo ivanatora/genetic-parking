@@ -17,6 +17,7 @@ function Population(cnt){
         for (var i = 0; i < this.members.length; i++){
 //            this.members[i].applyForce([random(0, 0.1), 0]);
             this.members[i].update();
+            this.members[i].evaluate();
             if (this.members[i].is_dead) cnt_dead++;
         }
 
@@ -34,28 +35,43 @@ function Population(cnt){
     
     this.evaluate = function(){
         $('#fitnesses').empty();
-        $('#fitnesses').append('<tr><th>Car</th><th>Fitness</th></tr>');
+        $('#fitnesses').append('<tr><th>Car</th><th>Fitness</th><th>Mating slots</th></tr>');
 
         var sum_fitness = 0;
         for (var i = 0; i < this.members.length; i++){
-            this.members[i].evaluate();
+            // this.members[i].evaluate();
             sum_fitness += this.members[i].fitness;
         }
         $('.sum_fitness').html(sum_fitness);
         $('.average_fitness').html(sum_fitness / this.members.length);
 
         if (sum_fitness > current_record) current_record = sum_fitness;
+
+        // stretch population fitness to 0-100 range
+        var min_fitness = 100;
+        for (var i = 0; i < this.members.length; i++){
+            if (this.members[i].fitness < min_fitness) min_fitness = this.members[i].fitness;
+        }
+        console.log('min fitness is', min_fitness)
+        for (var i = 0; i < this.members.length; i++){
+            this.members[i].allowed_mating_slots = map(this.members[i].fitness, min_fitness, 100, 0, 100);
+            this.members[i].allowed_mating_slots = Math.ceil(this.members[i].allowed_mating_slots / 10);
+            this.members[i].allowed_mating_slots += 1; // make sure everyone has at least one slot
+                console.log(i, 'allowed slots', this.members[i].allowed_mating_slots)
+        }
         
         this.mating_pool = [];
         for (var i = 0; i < this.members.length; i++){
-            $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].fitness+'</td></tr>');
-            var allowed_pool_slots = Math.floor(this.members[i].fitness / 10);
-            for (var j = 0; j < allowed_pool_slots; j++){
+            $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].fitness+'</td><td>'+
+                this.members[i].allowed_mating_slots+'</td></tr>');
+
+            for (var j = 0; j < this.members[i].allowed_mating_slots; j++){
                 this.mating_pool.push(this.members[i].next_genes);
             }
         }
-        $('#fitnesses').append('<tr><td>M. pool</td><td>'+this.mating_pool.length+'</td></tr>')
+        $('#fitnesses').append('<tr><td>M. pool</td><td>'+this.mating_pool.length+'</td></tr>');
         if (this.mating_pool.length == 0){
+            console.log('empty pool', this.members)
             run = false;
         }
 
@@ -63,13 +79,18 @@ function Population(cnt){
     
     this.crossover = function(){
         this.new_members = [];
-        for (var i = 0; i < this.cnt; i++){
+        console.log('begin to cross, and pool is', this.mating_pool.length)
+        // for (var i = 0; i < this.cnt; i++){
+        for (; this.new_members.length < this.cnt; ){
             var next_genes = [];
-            var idxA = Math.round(Math.random() * this.mating_pool.length)
-            var idxB = Math.round(Math.random() * this.mating_pool.length)
+            var idxA = Math.floor(Math.random() * this.mating_pool.length)
+            var idxB = Math.floor(Math.random() * this.mating_pool.length)
             var parentA = this.mating_pool[idxA];
             var parentB = this.mating_pool[idxB];
-            if (typeof parentA == 'undefined' || typeof parentB == 'undefined') return;
+            if (typeof parentA == 'undefined' || typeof parentB == 'undefined') {
+                console.log('cant select parent:', idxA, idxB, this.mating_pool)
+                break;
+            }
             
             var longer_parent, shorter_parent;
             if (parentA.length > parentB.length){
@@ -110,7 +131,13 @@ function Population(cnt){
             this.members[i].remove();
         }
 
+        if (this.new_members.length == 0){
+            run = false;
+            console.log('NO NEW MEMBERS')
+        }
+
         this.members = this.new_members;
+        console.log('purge, new members:', this.members.length)
     }
     
     this.resurrect = function(){

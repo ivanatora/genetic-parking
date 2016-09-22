@@ -181,18 +181,27 @@ window.Car = function(genes){
         var dist_front = this.front_shape.position.getDistance(targets[0]);
         var desired_angle = 0;
         var max_dist = 560;
-        this.fitness = map(dist_back, 0, max_dist, 100, 0);
+        var fitness_front = map(dist_front, 0, max_dist, 100, 0);
+        var fitness_back = map(dist_back, 0, max_dist, 100, 0);
+        this.fitness = (fitness_back + fitness_front) / 2;
         if (this.is_hit){
             this.fitness /= 2;
         }
-        this.fitness -= this.heading_radians * 5;
+        this.heading_penalty = map(Math.abs(this.heading_radians), 0, PI, 0, 50);
+        this.fitness -= this.heading_penalty;
+
         if (this.fitness < 0){
             this.fitness = 10;
+        }
+        if (this.fitness > 95){
+            run = false;
+            console.log('winner', this)
+            this.car_shape.fillColor = 'green';
         }
 
         this.fitness = Math.round(this.fitness);
         // this.fitness = Math.pow(this.fitness, 3);
-        console.log('fitness', this.fitness, this.heading_radians)
+        // console.log('fitness', this.fitness, this.heading_radians)
     }
     
     this.constrain_to_screen = function(){
