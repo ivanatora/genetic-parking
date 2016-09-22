@@ -40,7 +40,7 @@ function Population(cnt){
         var sum_fitness = 0;
         for (var i = 0; i < this.members.length; i++){
             // this.members[i].evaluate();
-            sum_fitness += this.members[i].fitness;
+            sum_fitness += this.members[i].max_fitness;
         }
         $('.sum_fitness').html(sum_fitness);
         $('.average_fitness').html(sum_fitness / this.members.length);
@@ -50,11 +50,11 @@ function Population(cnt){
         // stretch population fitness to 0-100 range
         var min_fitness = 100;
         for (var i = 0; i < this.members.length; i++){
-            if (this.members[i].fitness < min_fitness) min_fitness = this.members[i].fitness;
+            if (this.members[i].max_fitness < min_fitness) min_fitness = this.members[i].max_fitness;
         }
         console.log('min fitness is', min_fitness)
         for (var i = 0; i < this.members.length; i++){
-            this.members[i].allowed_mating_slots = map(this.members[i].fitness, min_fitness, 100, 0, 100);
+            this.members[i].allowed_mating_slots = map(this.members[i].max_fitness, min_fitness, 100, 0, 100);
             this.members[i].allowed_mating_slots = Math.ceil(this.members[i].allowed_mating_slots / 10);
             this.members[i].allowed_mating_slots += 1; // make sure everyone has at least one slot
                 console.log(i, 'allowed slots', this.members[i].allowed_mating_slots)
@@ -62,7 +62,7 @@ function Population(cnt){
         
         this.mating_pool = [];
         for (var i = 0; i < this.members.length; i++){
-            $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].fitness+'</td><td>'+
+            $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].max_fitness+'</td><td>'+
                 this.members[i].allowed_mating_slots+'</td></tr>');
 
             for (var j = 0; j < this.members[i].allowed_mating_slots; j++){

@@ -1,6 +1,6 @@
 width = view.size.width;
 height = view.size.height;
-frame_every = 2;
+frame_every = 1;
 fps_counter = 0;
 debug = false;
 

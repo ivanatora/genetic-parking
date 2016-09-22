@@ -9,6 +9,7 @@ window.Car = function(genes){
     this.tr = 0;
     
     this.fitness = 1;
+    this.max_fitness = 1;
     this.is_dead = false;
     this.is_hit = false;
     
@@ -91,7 +92,7 @@ window.Car = function(genes){
             impulse = this.genes[this.update_counter];
         }
         else {
-            impulse = Math.random() * 20 - 10; // random rotation
+            impulse = Math.random() * 30 - 15; // random rotation
         }
         // impulse = -10;
         this.next_genes.push(impulse); // save for further generations
@@ -200,6 +201,9 @@ window.Car = function(genes){
         }
 
         this.fitness = Math.round(this.fitness);
+        if (this.fitness > this.max_fitness){
+            this.max_fitness = this.fitness;
+        }
         // this.fitness = Math.pow(this.fitness, 3);
         // console.log('fitness', this.fitness, this.heading_radians)
     }
