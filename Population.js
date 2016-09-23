@@ -52,12 +52,12 @@ function Population(cnt){
         for (var i = 0; i < this.members.length; i++){
             if (this.members[i].max_fitness < min_fitness) min_fitness = this.members[i].max_fitness;
         }
-        console.log('min fitness is', min_fitness)
+        // console.log('min fitness is', min_fitness)
         for (var i = 0; i < this.members.length; i++){
             this.members[i].allowed_mating_slots = map(this.members[i].max_fitness, min_fitness, 100, 0, 100);
             this.members[i].allowed_mating_slots = Math.ceil(this.members[i].allowed_mating_slots / 10);
             this.members[i].allowed_mating_slots += 1; // make sure everyone has at least one slot
-                console.log(i, 'allowed slots', this.members[i].allowed_mating_slots)
+                // console.log(i, 'allowed slots', this.members[i].allowed_mating_slots)
         }
         
         this.mating_pool = [];
@@ -71,7 +71,7 @@ function Population(cnt){
         }
         $('#fitnesses').append('<tr><td>M. pool</td><td>'+this.mating_pool.length+'</td></tr>');
         if (this.mating_pool.length == 0){
-            console.log('empty pool', this.members)
+            // console.log('empty pool', this.members)
             run = false;
         }
 
@@ -79,7 +79,7 @@ function Population(cnt){
     
     this.crossover = function(){
         this.new_members = [];
-        console.log('begin to cross, and pool is', this.mating_pool.length)
+        // console.log('begin to cross, and pool is', this.mating_pool.length)
         // for (var i = 0; i < this.cnt; i++){
         for (; this.new_members.length < this.cnt; ){
             var next_genes = [];
@@ -137,7 +137,7 @@ function Population(cnt){
         }
 
         this.members = this.new_members;
-        console.log('purge, new members:', this.members.length)
+        // console.log('purge, new members:', this.members.length)
     }
     
     this.resurrect = function(){

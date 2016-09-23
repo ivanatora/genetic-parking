@@ -1,11 +1,11 @@
 width = view.size.width;
 height = view.size.height;
-frame_every = 10;
+frame_every = 1;
 fps_counter = 0;
 debug = false;
 
 iMutationRate = 10; //%
-iPopulationSize = 1;
+iPopulationSize = 10;
 bFinished = false;
 population = null;
 population_number = 0;
