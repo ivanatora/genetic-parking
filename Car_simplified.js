@@ -30,19 +30,33 @@ window.Car = function(genes){
 
     // wheels
     this.front_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
-    this.front_shape.fillColor = rgba(255, 0, 0, 0.5);
-    this.front_shape.strokeColor = 'green';
+    // this.front_shape.fillColor = rgba(255, 0, 0, 0.5);
+    // this.front_shape.strokeColor = 'green';
+    this.front_shape.fillColor = rgba(0, 0, 0, 0);
     this.front_shape.position.x = this.pos.x - axis_h/2 * cos(this.heading_radians);
     this.front_shape.position.y = this.pos.y - axis_h/2 * sin(this.heading_radians);
     this.front_shape.rotate(degrees(this.heading_radians));
     this.front_shape.rotate(this.current_wheel_angle);
+    this.front_up_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
+    this.front_up_shape.fillColor = rgba(255, 0, 0, 0.5);
+    this.front_up_shape.strokeColor = 'green';
+    this.front_down_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
+    this.front_down_shape.fillColor = rgba(255, 0, 0, 0.5);
+    this.front_down_shape.strokeColor = 'green';
 
     this.back_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
-    this.back_shape.fillColor = rgba(0, 0, 0, 0.1);
-    this.back_shape.strokeColor = 'green';
+    // this.back_shape.fillColor = rgba(0, 0, 0, 0.1);
+    this.back_shape.fillColor = rgba(0, 0, 0, 0);
+    // this.back_shape.strokeColor = 'green';
     this.back_shape.position.x = this.pos.x + axis_h/2 * cos(this.heading_radians);
     this.back_shape.position.y = this.pos.y + axis_h/2 * sin(this.heading_radians);
     this.back_shape.rotate(degrees(this.heading_radians));
+    this.back_up_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
+    this.back_up_shape.fillColor = rgba(0, 0, 0, 0.1);
+    this.back_up_shape.strokeColor = 'green';
+    this.back_down_shape = new Path.Rectangle(0, 0, this.tire_w, this.tire_h);
+    this.back_down_shape.fillColor = rgba(0, 0, 0, 0.1);
+    this.back_down_shape.strokeColor = 'green';
     
     
     this.tr_shape = new Path.Circle(new Point(0, 0), 1);
@@ -78,10 +92,16 @@ window.Car = function(genes){
         
         // rotate() works relative to the previous position, so make sure that position is 0
         this.front_shape.rotate(-this.last_wheel_angle);
+        this.front_up_shape.rotate(-this.last_wheel_angle);
+        this.front_down_shape.rotate(-this.last_wheel_angle);
         this.car_shape.rotate(degrees(-this.heading_radians));
         this.front_shape.rotate(degrees(-this.heading_radians));
+        this.front_up_shape.rotate(degrees(-this.heading_radians));
+        this.front_down_shape.rotate(degrees(-this.heading_radians));
         this.back_shape.rotate(degrees(-this.heading_radians));
-        
+        this.back_up_shape.rotate(degrees(-this.heading_radians));
+        this.back_down_shape.rotate(degrees(-this.heading_radians));
+
         //
         // this.car_shape.position = this.pos;
         // this.pos_shape.position = this.pos;
@@ -160,14 +180,35 @@ window.Car = function(genes){
 
         // and really move some shapes
         this.front_shape.rotate(this.current_wheel_angle);
+        this.front_up_shape.rotate(this.current_wheel_angle);
+        this.front_down_shape.rotate(this.current_wheel_angle);
         this.car_shape.rotate(degrees(this.heading_radians));
         this.car_shape.position = new_pos;
         this.front_shape.position.x = this.car_shape.position.x - axis_h/2 * cos(this.heading_radians);
         this.front_shape.position.y = this.car_shape.position.y - axis_h/2 * sin(this.heading_radians);
         this.front_shape.rotate(degrees(this.heading_radians));
+        this.front_up_shape.position = this.back_shape.position.subtract(this.front_shape.position);
+        this.front_up_shape.position.length = car_w / 2;
+        this.front_up_shape.position = this.front_up_shape.position.add(this.front_shape.position).rotate(-90, this.front_shape.position)
+        this.front_up_shape.rotate(degrees(this.heading_radians));
+
+        this.front_down_shape.position = this.back_shape.position.subtract(this.front_shape.position);
+        this.front_down_shape.position.length = car_w / 2;
+        this.front_down_shape.position = this.front_down_shape.position.add(this.front_shape.position).rotate(90, this.front_shape.position)
+        this.front_down_shape.rotate(degrees(this.heading_radians));
+
         this.back_shape.position.x = this.car_shape.position.x + axis_h/2 * cos(this.heading_radians);
         this.back_shape.position.y = this.car_shape.position.y + axis_h/2 * sin(this.heading_radians);
         this.back_shape.rotate(degrees(this.heading_radians));
+        this.back_up_shape.position = this.front_shape.position.subtract(this.back_shape.position);
+        this.back_up_shape.position.length = car_w / 2;
+        this.back_up_shape.position = this.back_up_shape.position.add(this.back_shape.position).rotate(-90, this.back_shape.position)
+        this.back_up_shape.rotate(degrees(this.heading_radians));
+
+        this.back_down_shape.position = this.front_shape.position.subtract(this.back_shape.position);
+        this.back_down_shape.position.length = car_w / 2;
+        this.back_down_shape.position = this.back_down_shape.position.add(this.back_shape.position).rotate(90, this.back_shape.position)
+        this.back_down_shape.rotate(degrees(this.heading_radians));
 
         this.pos = this.car_shape.position;
         
@@ -262,6 +303,10 @@ window.Car = function(genes){
     this.remove = function(){
         this.car_shape.remove();
         this.front_shape.remove();
+        this.front_up_shape.remove();
+        this.front_down_shape.remove();
         this.back_shape.remove();
+        this.back_up_shape.remove();
+        this.back_down_shape.remove();
     }
 }
