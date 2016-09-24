@@ -11,6 +11,10 @@ function Population(cnt){
     for (var i = 0; i < this.cnt; i++){
         this.members.push(new Car());
     }
+
+    this.setPopulationSize = function(n){
+        this.cnt = n;
+    }
     
     this.update = function(){
         cnt_dead = 0;

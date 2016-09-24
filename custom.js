@@ -118,8 +118,10 @@ $(document).ready(function(){
         if (isNaN(iPopulationSize)){
             iPopulationSize = 10;
         }
+        population.setPopulationSize(iPopulationSize)
 
-        setup();
+        population.lifespan = 0;
+
     })
 
     $('.pause').click(function(){

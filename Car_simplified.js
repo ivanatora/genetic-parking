@@ -230,7 +230,7 @@ window.Car = function(genes){
         if (this.is_hit){
             this.fitness /= 2;
         }
-        this.heading_penalty = Math.floor(map(Math.abs(this.heading_radians), 0, PI, 0, 50));
+        this.heading_penalty = Math.floor(map(Math.abs(this.heading_radians), 0, PI, 0, 40));
         this.fitness -= this.heading_penalty;
 
         if (this.fitness < 0){
