@@ -35,7 +35,7 @@ function Population(cnt){
     
     this.evaluate = function(){
         $('#fitnesses').empty();
-        $('#fitnesses').append('<tr><th>Car</th><th>Fitness</th><th>Mating slots</th></tr>');
+        $('#fitnesses').append('<tr><th>Car</th><th>Fitness</th><th>Mating slots</th><th>Angle penalty</th></tr>');
 
         var sum_fitness = 0;
         for (var i = 0; i < this.members.length; i++){
@@ -63,7 +63,7 @@ function Population(cnt){
         this.mating_pool = [];
         for (var i = 0; i < this.members.length; i++){
             $('#fitnesses').append('<tr><td>#'+i+': </td><td>'+this.members[i].max_fitness+'</td><td>'+
-                this.members[i].allowed_mating_slots+'</td></tr>');
+                this.members[i].allowed_mating_slots+'</td><td>-'+this.members[i].heading_penalty+'</td></tr>');
 
             for (var j = 0; j < this.members[i].allowed_mating_slots; j++){
                 this.mating_pool.push(this.members[i].next_genes);

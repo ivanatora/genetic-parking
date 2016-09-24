@@ -1,7 +1,7 @@
 window.Car = function(genes){
     this.pos = new Point(car_h/2, height/2);
 
-    this.maximum_wheel_angle = 30;
+    this.maximum_wheel_angle = 40;
     this.current_wheel_angle = 0;
     this.last_wheel_angle = 0;
     this.heading_radians = 0;
@@ -223,14 +223,14 @@ window.Car = function(genes){
         var dist_back = this.back_shape.position.getDistance(targets[1]);
         var dist_front = this.front_shape.position.getDistance(targets[0]);
         var desired_angle = 0;
-        var max_dist = 560;
+        var max_dist = 200;
         var fitness_front = map(dist_front, 0, max_dist, 100, 0);
         var fitness_back = map(dist_back, 0, max_dist, 100, 0);
         this.fitness = (fitness_back + fitness_front) / 2;
         if (this.is_hit){
             this.fitness /= 2;
         }
-        this.heading_penalty = map(Math.abs(this.heading_radians), 0, PI, 0, 50);
+        this.heading_penalty = Math.floor(map(Math.abs(this.heading_radians), 0, PI, 0, 50));
         this.fitness -= this.heading_penalty;
 
         if (this.fitness < 0){
@@ -240,6 +240,7 @@ window.Car = function(genes){
         if (this.fitness > 90 && this.fitness < this.last_fitness){
             run = false;
             console.log('winner', this)
+            console.log('fitness_front', fitness_front, 'back', fitness_back)
             this.car_shape.fillColor = 'green';
         }
 
