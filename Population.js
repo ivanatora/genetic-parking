@@ -81,7 +81,7 @@ function Population(cnt){
         this.new_members = [];
         // console.log('begin to cross, and pool is', this.mating_pool.length)
         // for (var i = 0; i < this.cnt; i++){
-        for (; this.new_members.length < this.cnt; ){
+        for (var i = 0; this.new_members.length < this.cnt; i++){
             var next_genes = [];
             var idxA = Math.floor(Math.random() * this.mating_pool.length)
             var idxB = Math.floor(Math.random() * this.mating_pool.length)
@@ -121,6 +121,11 @@ function Population(cnt){
                 var gene_value = Math.random() * 20 - 10;
                 // console.log('Mutation! gene', gene_idx, 'from', next_genes[gene_idx], 'to', gene_value)
                 next_genes[gene_idx] = gene_value;
+            }
+
+            if (i == 0){
+                // lets give the 0th member a set of fresh genes
+                next_genes = [];
             }
 
             this.new_members.push(new Car(next_genes));
