@@ -119,6 +119,7 @@ function Population(cnt){
             if (Math.random() * 100 < iMutationRate){
                 var gene_idx = Math.round(Math.random() * next_genes.length);
                 var gene_value = Math.random() * 20 - 10;
+                // console.log('Mutation! gene', gene_idx, 'from', next_genes[gene_idx], 'to', gene_value)
                 next_genes[gene_idx] = gene_value;
             }
 

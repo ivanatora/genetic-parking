@@ -9,6 +9,7 @@ window.Car = function(genes){
     this.tr = 0;
     
     this.fitness = 1;
+    this.last_fitness = 0;
     this.max_fitness = 1;
     this.is_dead = false;
     this.is_hit = false;
@@ -235,7 +236,8 @@ window.Car = function(genes){
         if (this.fitness < 0){
             this.fitness = 10;
         }
-        if (this.fitness > 95){
+
+        if (this.fitness > 90 && this.fitness < this.last_fitness){
             run = false;
             console.log('winner', this)
             this.car_shape.fillColor = 'green';
@@ -245,6 +247,7 @@ window.Car = function(genes){
         if (this.fitness > this.max_fitness){
             this.max_fitness = this.fitness;
         }
+        this.last_fitness = this.fitness;
         // this.fitness = Math.pow(this.fitness, 3);
         // console.log('fitness', this.fitness, this.heading_radians)
     }
@@ -277,25 +280,12 @@ window.Car = function(genes){
     
     this.check_obstacles = function(){
         for (var i = 0; i < obstacles.length; i++){
-            if (obstacles[i].shape.contains(this.car_shape.bounds.topLeft)){
-                this.is_dead = true;
-                this.is_hit = true;
-                return;
-            }
-            if (obstacles[i].shape.contains(this.car_shape.bounds.topRight)){
-                this.is_dead = true;
-                this.is_hit = true;
-                return;
-            }
-            if (obstacles[i].shape.contains(this.car_shape.bounds.bottomLeft)){
-                this.is_dead = true;
-                this.is_hit = true;
-                return;
-            }
-            if (obstacles[i].shape.contains(this.car_shape.bounds.bottomRight)){
-                this.is_dead = true;
-                this.is_hit = true;
-                return;
+            for (var j = 0; j < 4; j++){
+                if (obstacles[i].shape.contains(this.car_shape.segments[j].point)){
+                    this.is_dead = true;
+                    this.is_hit = true;
+                    return;
+                }
             }
         }
     }
