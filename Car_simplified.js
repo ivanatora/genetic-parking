@@ -134,8 +134,10 @@ window.Car = function(genes){
         this.tr += car_w / 2;
 
         // get the turning radius and shape
+        var backShapePos = this.back_shape.position;
+        var frontShapePos = this.front_shape.position;
         var radius_center = null;
-        radius_center = this.back_shape.position.subtract(this.front_shape.position)//.rotate(-90);
+        radius_center = backShapePos.subtract(frontShapePos)//.rotate(-90);
         if (this.current_wheel_angle > 0) {
             radius_center = radius_center.rotate(-90);
         }
@@ -150,9 +152,9 @@ window.Car = function(genes){
         this.tr_shape.scale(this.tr / tmp_r);
         
         this.radius_line.segments[0].point = radius_center;
-        this.radius_line.segments[1].point = this.back_shape.position;
+        this.radius_line.segments[1].point = backShapePos;
         
-        var cntr_to_back = this.back_shape.position.subtract(radius_center);
+        var cntr_to_back = backShapePos.subtract(radius_center);
         var new_arc_angle_radians = cntr_to_back.angleInRadians - arc_angle;
 
         // the back of the car should be on that turning circle
@@ -185,30 +187,31 @@ window.Car = function(genes){
         this.front_down_shape.rotate(this.current_wheel_angle);
         this.car_shape.rotate(degrees(this.heading_radians));
         this.car_shape.position = new_pos;
-        this.front_shape.position.x = this.car_shape.position.x - axis_h/2 * cos(this.heading_radians);
-        this.front_shape.position.y = this.car_shape.position.y - axis_h/2 * sin(this.heading_radians);
+
+        frontShapePos.x = this.car_shape.position.x - axis_h/2 * cos(this.heading_radians);
+        frontShapePos.y = this.car_shape.position.y - axis_h/2 * sin(this.heading_radians);
         this.front_shape.rotate(degrees(this.heading_radians));
-        this.front_up_shape.position = this.back_shape.position.subtract(this.front_shape.position);
+        this.front_up_shape.position = backShapePos.subtract(frontShapePos);
         this.front_up_shape.position.length = car_w / 2;
-        this.front_up_shape.position = this.front_up_shape.position.add(this.front_shape.position).rotate(-90, this.front_shape.position)
+        this.front_up_shape.position = this.front_up_shape.position.add(frontShapePos).rotate(-90, frontShapePos)
         this.front_up_shape.rotate(degrees(this.heading_radians));
 
-        this.front_down_shape.position = this.back_shape.position.subtract(this.front_shape.position);
+        this.front_down_shape.position = backShapePos.subtract(frontShapePos);
         this.front_down_shape.position.length = car_w / 2;
-        this.front_down_shape.position = this.front_down_shape.position.add(this.front_shape.position).rotate(90, this.front_shape.position)
+        this.front_down_shape.position = this.front_down_shape.position.add(frontShapePos).rotate(90, frontShapePos)
         this.front_down_shape.rotate(degrees(this.heading_radians));
 
-        this.back_shape.position.x = this.car_shape.position.x + axis_h/2 * cos(this.heading_radians);
-        this.back_shape.position.y = this.car_shape.position.y + axis_h/2 * sin(this.heading_radians);
+        backShapePos.x = this.car_shape.position.x + axis_h/2 * cos(this.heading_radians);
+        backShapePos.y = this.car_shape.position.y + axis_h/2 * sin(this.heading_radians);
         this.back_shape.rotate(degrees(this.heading_radians));
-        this.back_up_shape.position = this.front_shape.position.subtract(this.back_shape.position);
+        this.back_up_shape.position = frontShapePos.subtract(backShapePos);
         this.back_up_shape.position.length = car_w / 2;
-        this.back_up_shape.position = this.back_up_shape.position.add(this.back_shape.position).rotate(-90, this.back_shape.position)
+        this.back_up_shape.position = this.back_up_shape.position.add(backShapePos).rotate(-90, backShapePos)
         this.back_up_shape.rotate(degrees(this.heading_radians));
 
-        this.back_down_shape.position = this.front_shape.position.subtract(this.back_shape.position);
+        this.back_down_shape.position = frontShapePos.subtract(backShapePos);
         this.back_down_shape.position.length = car_w / 2;
-        this.back_down_shape.position = this.back_down_shape.position.add(this.back_shape.position).rotate(90, this.back_shape.position)
+        this.back_down_shape.position = this.back_down_shape.position.add(backShapePos).rotate(90, backShapePos)
         this.back_down_shape.rotate(degrees(this.heading_radians));
 
         this.pos = this.car_shape.position;
